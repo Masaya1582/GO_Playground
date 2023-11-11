@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Task Manager</title>
+</head>
+<body>
+    <h1>Task Manager</h1>
+    
+    <h2>Tasks</h2>
+    <ul id="task-list"></ul>
+    
+    <h2>Add Task</h2>
+    <input type="text" id="task-title" placeholder="Task title">
+    <button onclick="addTask()">Add Task</button>
+
+    <script>
+        async function addTask() {
+            const title = document.getElementById('task-title').value;
+            if (!title) return;
+
+            const response = await fetch('http://localhost:8080/tasks', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    title,
+                    done: false,
+                }),
+            });
+
+            const newTask = await response.json();
+            document.getElementById('task-list').innerHTML += `<li>${newTask.title}</li>`;
+        }
+
+        async function fetchTasks() {
+            const response = await fetch('http://localhost:8080/tasks');
+            const tasks = await response.json();
+
+            const taskList = document.getElementById('task-list');
+            taskList.innerHTML = tasks.map(task => `<li>${task.title}</li>`).join('');
+        }
+
+        fetchTasks();
+    </script>
+</body>
+</html>
